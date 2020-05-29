@@ -17,6 +17,8 @@ class Zomato:
         self.user_key = user_key
         self.base_url = "https://developers.zomato.com/api/v2.1/"
         self.path_to_folder="raw_data"
+        self.read_rest = []
+        self.read_list = []
 
 
     def search(self, city_id, entity_type):
@@ -32,14 +34,12 @@ class Zomato:
         # if city_id.isnumeric() == False:
         #     raise ValueError("Invalid city_id")
 
-        headers = {'Accept': 'application/json', 'user-key': self.user_key}
-        r = (requests.get(self.base_url + "search?entity_id="+ str(city_id) + "&entity_type=" + str(entity_type), headers=headers).content).decode("utf-8")
-        a = json.loads(r,strict=False)
+        headers = {'user-key': self.user_key}
+        response = requests.get(self.base_url + "search?entity_id="+ str(city_id) + "&entity_type=" + str(entity_type)+"&start=1&count=20", headers=headers)
+        self.read_rest = json.loads(response.text)
+        self.read_list.append(self.read_rest)
 
-        # name of file 
-        path = os.path.join(self.path_to_folder,str(city_id)+'_'+str(entity_type)+'.json') 
-
-        # check if directory exists
+        # # check if directory exists
         if not os.path.isdir(self.path_to_folder):
             # make directory
             try:
@@ -47,12 +47,22 @@ class Zomato:
             except FileExistsError:
                 print("Directory " + self.path_to_folder + " already exist")
 
-            
-        # dumping json file
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump(a, f, ensure_ascii=False, indent=4)
-            print("File saved successfully. . .")
+        
+        # check if file exists
+        if not os.path.isfile(str(city_id)+'_'+str(entity_type+'.json')):
+            try:
+                # make filr
+                # name of file 
+                path = os.path.join(self.path_to_folder,str(city_id)+'_'+str(entity_type)+'.json') 
+                
+                # # dumping json file
+                with open(path, 'w') as jsonfile:
+                    json.dump(self.read_list, jsonfile)
+                    print("File saved successfully. . .")
+            except:
+                print("File "+str(city_id)+'_'+str(entity_type)+'.json already exists')
 
-        return a
+
+        return self.read_list
 
     
