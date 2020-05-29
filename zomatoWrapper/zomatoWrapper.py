@@ -1,3 +1,4 @@
+import requests
 import json,os,re,datetime
 import ast
 import csv
@@ -28,16 +29,25 @@ class Zomato:
         """
 
         
-        if city_id.isnumeric() == False:
-            raise ValueError("Invalid city_id")
+        # if city_id.isnumeric() == False:
+        #     raise ValueError("Invalid city_id")
 
         headers = {'Accept': 'application/json', 'user-key': self.user_key}
-        r = (requests.get(base_url + "search?entity_id="+ str(city_id) + "&entity_type=" + str(entity_type), headers=headers).content).decode("utf-8")
+        r = (requests.get(self.base_url + "search?entity_id="+ str(city_id) + "&entity_type=" + str(entity_type), headers=headers).content).decode("utf-8")
         a = json.loads(r,strict=False)
 
         # name of file 
-        path = os.path.join(path_to_folder,str(city_id)+'_'+str(entity_type)+'.json') 
+        path = os.path.join(self.path_to_folder,str(city_id)+'_'+str(entity_type)+'.json') 
 
+        # check if directory exists
+        if not os.path.isdir(self.path_to_folder):
+            # make directory
+            try:
+                os.makedirs(self.path_to_folder)
+            except FileExistsError:
+                print("Directory " + self.path_to_folder + " already exist")
+
+            
         # dumping json file
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(a, f, ensure_ascii=False, indent=4)
