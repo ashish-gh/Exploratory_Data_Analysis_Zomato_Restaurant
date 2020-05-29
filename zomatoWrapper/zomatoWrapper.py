@@ -17,6 +17,7 @@ class Zomato:
         self.user_key = user_key
         self.base_url = "https://developers.zomato.com/api/v2.1/"
         self.path_to_folder="raw_data"
+        self.path_to_review_folder="raw_data_reviews"
         self.read_rest = []
         self.read_list = []
 
@@ -62,7 +63,67 @@ class Zomato:
             except:
                 print("File "+str(city_id)+'_'+str(entity_type)+'.json already exists')
 
-
         return self.read_list
+
+    
+    def get_reviews(self, restaurant_id):
+
+        """This api provides you with list
+        of reviews for restaurant .
+
+        Parameters:
+        restaurant_id: ID of restaurant 
+        """
+        
+        headers = {'user-key': self.user_key}
+        response = requests.get(self.base_url + "reviews?res_id="+str(restaurant_id), headers=headers)
+        self.read_rest = json.loads(response.text)
+        
+        for i in range(len(self.read_rest)):
+
+                print("yes")
+
+        # self.read_list.append(self.read_rest)
+
+
+        # path = os.path.join(self.path_to_review_folder,'reviews_restaurant.json') 
+                
+        # with open(path, 'w') as jsonfile:
+        #     json.dump(self.read_list, jsonfile)
+        #     print("File saved successfully. . .")
+        
+
+    def get_reviews(self):
+
+        """This api provides you with list
+        of reviews for restaurant .
+
+        Parameters:
+        restaurant_id: ID of restaurant 
+        """
+        
+        headers = {'Accept': 'application/json', 'user-key': self.user_key}
+
+        review_details = {}
+
+        for rest_id in [18198449,18945610,496,313106,18377912]:
+
+            response = (requests.get(self.base_url + "reviews?res_id="+str(rest_id), headers=headers).content).decode('utf-8')
+            loaded_file = json.loads(response)
+        
+            for i in loaded_file['user_reviews']:
+                review_details.update({i['review']['review_text'] : rest_id})
+            
+            print("Printing for : {}".format(rest_id))
+            
+        path = os.path.join(self.path_to_review_folder,'reviews_restaurant.json') 
+                
+        with open(path, 'w') as jsonfile:
+            json.dump(review_details, jsonfile)
+            print("File saved successfully. . .")
+
+
+
+
 
     
