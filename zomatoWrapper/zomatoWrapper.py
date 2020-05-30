@@ -18,8 +18,10 @@ class Zomato:
         self.base_url = "https://developers.zomato.com/api/v2.1/"
         self.path_to_folder="raw_data"
         self.path_to_review_folder="raw_data_reviews"
+        self.path_to_processed_data= "processed_data"
         self.read_rest = []
         self.read_list = []
+        global read_file
 
 
     def search(self, city_id, entity_type):
@@ -95,6 +97,7 @@ class Zomato:
 
     def get_reviews(self):
 
+
         """This api provides you with list
         of reviews for restaurant .
 
@@ -106,8 +109,18 @@ class Zomato:
 
         review_details = {}
 
-        for rest_id in [18198449,18945610,496,313106,18377912]:
+        # Read restaurant file 
+        try:
+            with open(os.path.join(self.path_to_processed_data,"restaurant_id.txt"), "r") as read_file:
+                rest_ID= []
+                for i in read_file:
+                    i = i.replace('\n', '')
+                    rest_ID.append(i)
+        except IOError:
+            print("File not found")
+            return
 
+        for rest_id in rest_ID[:900]:
             response = (requests.get(self.base_url + "reviews?res_id="+str(rest_id), headers=headers).content).decode('utf-8')
             loaded_file = json.loads(response)
         
@@ -115,8 +128,9 @@ class Zomato:
                 review_details.update({i['review']['review_text'] : rest_id})
             
             print("Printing for : {}".format(rest_id))
-            
-        path = os.path.join(self.path_to_review_folder,'reviews_restaurant.json') 
+
+            # save review of received restaurant to json
+        path = os.path.join(self.path_to_review_folder,'reviews_restaurant_0_900.json') 
                 
         with open(path, 'w') as jsonfile:
             json.dump(review_details, jsonfile)
