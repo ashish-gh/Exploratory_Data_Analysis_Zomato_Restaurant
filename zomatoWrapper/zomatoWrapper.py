@@ -120,7 +120,7 @@ class Zomato:
             print("File not found")
             return
 
-        for rest_id in rest_ID[:900]:
+        for rest_id in rest_ID[900:1800]:
             response = (requests.get(self.base_url + "reviews?res_id="+str(rest_id), headers=headers).content).decode('utf-8')
             loaded_file = json.loads(response)
         
@@ -130,14 +130,8 @@ class Zomato:
             print("Printing for : {}".format(rest_id))
 
             # save review of received restaurant to json
-        path = os.path.join(self.path_to_review_folder,'reviews_restaurant_0_900.json') 
+        path = os.path.join(self.path_to_review_folder,'reviews_restaurant_900_1800.json') 
                 
         with open(path, 'w') as jsonfile:
             json.dump(review_details, jsonfile)
             print("File saved successfully. . .")
-
-
-
-
-
-    
