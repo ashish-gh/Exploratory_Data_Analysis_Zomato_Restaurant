@@ -21,8 +21,6 @@ from rest_framework.response import Response
 from apps.ml.registry import MLRegistry
 from server.wsgi import registry
 
-
-
 # 
 class EndpointViewSet(
     mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
